@@ -1,5 +1,6 @@
 name: Deploy Power Platform Solution (Username/Password)
 
+# Trigger the workflow on pushes to main
 on:
   push:
     branches:
@@ -10,21 +11,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js v16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Install Power Platform CLI
-        run: npm install -g pac
-
+      # Step 2: Authenticate to Power Platform using username/password
       - name: Authenticate to Power Platform
         run: |
           pac auth create --url ${{ secrets.PP_ENV_URL }} --username ${{ secrets.PP_USERNAME }} --password ${{ secrets.PP_PASSWORD }}
-      
+
+      # Step 3: Import Power Platform solution
       - name: Import Solution
         run: |
           pac solution import --path ./TaskApp_1_0_0_1.zip --overwrite true
+
+      # Step 4: Optional: list imported solutions for confirmation
+      - name: List Solutions
+        run: |
+          pac solution list
