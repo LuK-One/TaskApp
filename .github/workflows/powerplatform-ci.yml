@@ -13,9 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup Node.js v16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
       - name: Install Power Platform CLI
-        run: |
-          npm install -g pac
+        run: npm install -g pac
 
       - name: Authenticate to Power Platform
         run: |
