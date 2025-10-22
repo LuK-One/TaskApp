@@ -1,6 +1,5 @@
 name: Deploy Power Platform Solution (Username/Password)
 
-# Trigger the workflow on pushes to main
 on:
   push:
     branches:
@@ -11,21 +10,28 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # Step 1: Checkout code
+      # 1. Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Authenticate to Power Platform using username/password
+      # 2. Download Power Platform CLI
+      - name: Download Power Platform CLI
+        run: |
+          Invoke-WebRequest -Uri "https://aka.ms/PowerPlatformCLI-Win-x64" -OutFile "pac.zip"
+          Expand-Archive -LiteralPath pac.zip -DestinationPath ./pac
+          $env:PATH = "$env:PATH;$(Resolve-Path ./pac)"
+
+      # 3. Authenticate to Power Platform
       - name: Authenticate to Power Platform
         run: |
           pac auth create --url ${{ secrets.PP_ENV_URL }} --username ${{ secrets.PP_USERNAME }} --password ${{ secrets.PP_PASSWORD }}
 
-      # Step 3: Import Power Platform solution
+      # 4. Import solution
       - name: Import Solution
         run: |
           pac solution import --path ./TaskApp_1_0_0_1.zip --overwrite true
 
-      # Step 4: Optional: list imported solutions for confirmation
+      # 5. Optional: list solutions
       - name: List Solutions
         run: |
           pac solution list
